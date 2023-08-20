@@ -58,12 +58,12 @@ export default function ClusterModal() {
   return (
     <Dialog.Root open={open} onOpenChange={setOpen}>
       <Dialog.Trigger>
-        <Button variant="outline">Add Cluster</Button>
+        <Button variant="outline">Add Server</Button>
       </Dialog.Trigger>
 
       <Dialog.Content style={{ overflow: "hidden", padding: 0, margin: 24 }}>
         <form onSubmit={HandleSubmit}>
-          <Dialog.Title className="px-6 pt-6">Add Cluster</Dialog.Title>
+          <Dialog.Title className="px-6 pt-6">Server Info</Dialog.Title>
           <ScrollArea
             type="auto"
             scrollbars="vertical"
