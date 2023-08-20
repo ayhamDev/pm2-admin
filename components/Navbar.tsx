@@ -16,11 +16,11 @@ import Avatar from "./Avatar";
 export default function Navbar() {
   return (
     <Card
-      className="bg-[var(--gray-a3)] !rounded-none !fixed !top-0 w-full backdrop-blur-md after:hidden"
+      className="bg-[var(--gray-a3)] !rounded-none !fixed !top-0 w-full backdrop-blur-md after:hidden !z-10"
       m={"auto"}
     >
-      <Container size={"4"}>
-        <nav className="px-3 py-2">
+      <Container size={"4"} className="px-3 ">
+        <nav className="py-2">
           <Flex justify={"between"} align={"center"}>
             <Heading>PM2 ADMIN</Heading>
             <Flex gap={"4"} align={"center"}>

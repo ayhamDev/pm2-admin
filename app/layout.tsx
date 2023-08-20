@@ -1,9 +1,11 @@
 import "./globals.css";
 import "@radix-ui/themes/styles.css";
 import { Theme } from "@radix-ui/themes";
+import { QueryClient, QueryClientProvider } from "react-query";
 
 import type { Metadata } from "next";
 import ClientThemeProvider from "@/components/ClientThemeProvider";
+import Providers from "@/components/Providers";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -18,9 +20,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <ClientThemeProvider>
-          <Theme>{children}</Theme>
-        </ClientThemeProvider>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

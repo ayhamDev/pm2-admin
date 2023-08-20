@@ -6,6 +6,11 @@ const config: Config = {
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
-  plugins: [],
+  plugins: [
+    // Initialize with default values (see options below)
+    require("tailwindcss-radix")({
+      variantPrefix: "radix",
+    }),
+  ],
 };
 export default config;
