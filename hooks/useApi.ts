@@ -5,7 +5,7 @@ import React from "react";
 import { z } from "zod";
 interface IAPI {
   url: string;
-  key: "cluster";
+  key: string;
   method?: "GET" | "POST" | "PATH" | "PUT" | "DELETE";
   body?: object;
 }
@@ -14,20 +14,21 @@ export default function useApi<T>(
   config?: AxiosRequestConfig
 ): {
   data: T | null;
-  SetData: React.SetStateAction<React.Dispatch<T | null>>;
   loading: boolean;
+  cached: boolean;
   error: Error | null;
 } {
-  const { override, Cache } = useCache((state) => state);
+  const { override, add, Cache } = useCache((state) => state);
   const [loading, SetLoading] = React.useState<boolean>(true);
   const [error, SetError] = React.useState<Error | null>(null);
+  const [cached, SetCached] = React.useState<boolean>(false);
   const controller = new AbortController();
 
   React.useEffect(() => {
-    window.addEventListener("online", () => {});
     if (method == "GET") {
       if (Cache[key]) {
         SetLoading(false);
+        SetCached(true);
         SetError(null);
         console.log(
           "Data Has Been Loaded From Cache. Fetching New Data in The background"
@@ -40,23 +41,38 @@ export default function useApi<T>(
         })
         .then((res) => {
           SetLoading(false);
+          SetCached(false);
           SetError(null);
-          override("cluster", res.data);
+          override(key, res.data);
+          if (Array.isArray(res.data)) {
+            res.data?.forEach((item: any) => {
+              override(`${key}@${item._id}`, item);
+            });
+          }
+
           console.log(
             "Data Has Been Fetched in The background. The Cache Has Beend Updated."
           );
         })
         .catch(function (error) {
-          if (error.response) {
-            SetLoading(false);
-            SetError(error);
-          } else if (error.request) {
-            SetLoading(false);
-            SetError(error);
-          } else {
-            SetLoading(false);
-            SetError(error);
-          }
+          SetLoading(false);
+          SetError(error);
+        });
+    }
+    if (method == "POST") {
+      axios
+        .post(url, body, {
+          signal: controller.signal,
+          ...config,
+        })
+        .then((res) => {
+          SetLoading(false);
+          SetError(null);
+          add(key, res.data);
+        })
+        .catch(function (error) {
+          SetLoading(false);
+          SetError(error);
         });
     }
 
@@ -67,6 +83,7 @@ export default function useApi<T>(
 
   return {
     data: Cache[key],
+    cached,
     loading,
     error,
   };

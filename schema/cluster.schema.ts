@@ -6,6 +6,7 @@ export interface ICluster {
 }
 export default z.object({
   ServerName: z.string().min(1),
-  IpAddress: z.string().ip(),
-  Token: z.string().min(12).max(128),
+  IpAddress: z.string().min(4),
+  Token: z.string().min(12),
+  _id: z.string().optional(),
 });

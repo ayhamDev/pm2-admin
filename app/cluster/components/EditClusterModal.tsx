@@ -1,4 +1,5 @@
 "use client";
+import useApi from "@/hooks/useApi";
 import clusterSchema from "@/schema/cluster.schema";
 import useCache from "@/store/useCache";
 import {
@@ -12,17 +13,25 @@ import {
 import axios from "axios";
 import React, { useEffect, useRef, useState } from "react";
 import { ZodError } from "zod";
+import { z } from "zod";
 
-export default function ClusterModal() {
+interface IEditClusterModal {
+  open: boolean;
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  id: string | null;
+}
+
+export default function EditClusterModal({
+  open,
+  setOpen,
+  id,
+}: IEditClusterModal) {
+  const UpdateCache = useCache((state) => state.update);
   const NameRef = React.useRef<null | HTMLInputElement>(null);
   const IpRef = React.useRef<null | HTMLInputElement>(null);
   const TokenRef = React.useRef<null | HTMLInputElement>(null);
   const [error, setError] = useState<ZodError | null>(null);
   const [loading, setLoading] = useState<boolean | null>(false);
-  const [open, setOpen] = useState<boolean>(false);
-
-  const addCache = useCache((state) => state.add);
-
   const HandleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -34,17 +43,21 @@ export default function ClusterModal() {
         Token: TokenRef.current?.value,
       });
       axios
-        .post("/api/cluster", {
+        .put(`/api/cluster/${id}`, {
           ServerName: NameRef.current?.value,
           IpAddress: IpRef.current?.value,
           Token: TokenRef.current?.value,
         })
         .then((res) => {
-          addCache("cluster", res.data);
+          UpdateCache("cluster", res.data);
+          UpdateCache(`cluster@${res.data._id}`, res.data);
+
           setError(null);
           setOpen(false);
         })
         .catch((err) => {
+          console.log(err);
+
           setError(err);
         })
         .finally(() => {
@@ -52,18 +65,19 @@ export default function ClusterModal() {
         });
     } catch (err) {
       setLoading(false);
+
       setError(JSON.parse(err));
     }
   };
+  const { data } = useApi<z.infer<typeof clusterSchema>>({
+    url: `/api/cluster/${id}`,
+    key: `cluster@${id}`,
+  });
   return (
     <Dialog.Root open={open} onOpenChange={setOpen}>
-      <Dialog.Trigger>
-        <Button variant="outline">Add Server</Button>
-      </Dialog.Trigger>
-
       <Dialog.Content style={{ overflow: "hidden", padding: 0, margin: 24 }}>
         <form onSubmit={HandleSubmit}>
-          <Dialog.Title className="px-6 pt-6">Server Info</Dialog.Title>
+          <Dialog.Title className="px-6 pt-6">Edit Server Info</Dialog.Title>
           <ScrollArea
             type="auto"
             scrollbars="vertical"
@@ -74,7 +88,11 @@ export default function ClusterModal() {
                 <Text as="div" size="2" mb="1" weight="medium">
                   Server Name
                 </Text>
-                <TextField.Input ref={NameRef} placeholder="My Server..." />
+                <TextField.Input
+                  defaultValue={data?.ServerName}
+                  ref={NameRef}
+                  placeholder="My Server..."
+                />
               </label>
               <label>
                 <Text as="div" size="2" mb="1" weight="medium">
@@ -82,6 +100,7 @@ export default function ClusterModal() {
                 </Text>
                 <TextField.Input
                   ref={IpRef}
+                  defaultValue={data?.IpAddress}
                   placeholder="http://127.0.0.1:3020"
                 />
               </label>
@@ -91,6 +110,7 @@ export default function ClusterModal() {
                 </Text>
                 <TextField.Input
                   ref={TokenRef}
+                  defaultValue={data?.Token}
                   placeholder="Valid JWT Token From The Server"
                 />
               </label>
@@ -99,7 +119,7 @@ export default function ClusterModal() {
           <div className="px-6 mt-4">
             <Text color="red">
               {error &&
-                error.map((err, index) => (
+                error?.map((err, index) => (
                   <Text
                     key={index}
                     className="w-full block"
