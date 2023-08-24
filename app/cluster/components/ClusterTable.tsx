@@ -1,24 +1,24 @@
 "use client";
 import { Box, ContextMenu, Flex, Heading, Table, Text } from "@radix-ui/themes";
 import isMobile from "is-mobile";
-import React, { useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import ClusterModal from "./ClusterModal";
 import { useRouter } from "next/navigation";
 import { z } from "zod";
 import clusterSchema from "@/schema/cluster.schema";
 import useApi from "@/hooks/useApi";
-import useCache from "@/store/useCache";
-import Toast from "@/components/Toast";
-import axios from "axios";
-import { log } from "console";
-import cluster from "cluster";
+import Toast, { IToast } from "@/components/Toast";
 import StatusCell from "./StatusCell";
 import EditClusterModal from "./EditClusterModal";
 import DeleteClusterModal from "./DeleteClusterModal";
 
+import Skeleton from "react-loading-skeleton";
+import "react-loading-skeleton/dist/skeleton.css";
+
 export default function ClusterTable() {
   const router = useRouter();
-  const [ToastOpen, setToastOpen] = React.useState<boolean>(false);
+
+  const [Toasts, setToasts] = React.useState<IToast[]>([]);
 
   const [EditModalOpen, SetEditModalOpen] = React.useState<boolean>(false);
   const [EditModalID, SetEditModalID] = React.useState<string | undefined>(
@@ -36,13 +36,60 @@ export default function ClusterTable() {
     url: "/api/cluster",
     key: "cluster",
   });
+  if (loading)
+    return (
+      <Box mb={"6"}>
+        <Flex mb={"4"} justify={"between"} align={"center"}>
+          <Heading>Cluster Manager</Heading>
+        </Flex>
+        <Table.Root
+          variant="surface"
+          size={isMobile() ? "3" : "3"}
+          className="select-none z-0"
+        >
+          <Table.Header>
+            <Table.Row>
+              <Table.ColumnHeaderCell>Server Name</Table.ColumnHeaderCell>
+              <Table.ColumnHeaderCell>URL</Table.ColumnHeaderCell>
+              <Table.ColumnHeaderCell>Status</Table.ColumnHeaderCell>
+            </Table.Row>
+          </Table.Header>
 
-  if (loading) return <Heading>Loading...</Heading>;
+          <Table.Body>
+            <Table.Row>
+              <Table.RowHeaderCell>
+                <Skeleton
+                  style={{
+                    backgroundColor: "var(--Prime)",
+                  }}
+                />
+              </Table.RowHeaderCell>
+              <Table.Cell>
+                <Skeleton
+                  style={{
+                    backgroundColor: "var(--Prime)",
+                  }}
+                />
+              </Table.Cell>
+              <Table.Cell>
+                <Skeleton
+                  style={{
+                    backgroundColor: "var(--Prime)",
+                  }}
+                />
+              </Table.Cell>
+            </Table.Row>
+          </Table.Body>
+        </Table.Root>
+      </Box>
+    );
   if (error) return <Text>{error.message}</Text>;
 
   return (
     <Box mb={"6"}>
-      <Toast open={ToastOpen} setOpen={setToastOpen} />
+      {/* {Toasts.map((toast, index) => (
+        <Toast setToasts={setToasts} header={toast.header} text={toast.text} />
+      ))} */}
       <Flex mb={"4"} justify={"between"} align={"center"}>
         <Heading>Cluster Manager</Heading>
         <ClusterModal />
@@ -77,9 +124,9 @@ export default function ClusterTable() {
         <Table.Body>
           {data?.map((cluster, index) => (
             <ContextMenu.Root key={index}>
-              <ContextMenu.Trigger>
+              <ContextMenu.Trigger className="hover:!bg-[--Prime]">
                 <Table.Row
-                  onClick={() => router.push(`/cluster/${cluster.IpAddress}`)}
+                  onClick={() => router.push(`/cluster/${cluster._id}`)}
                 >
                   <Table.RowHeaderCell>
                     {cluster.ServerName}
@@ -94,7 +141,12 @@ export default function ClusterTable() {
                       </span>
                     </Table.Cell>
                   ) : (
-                    <StatusCell ip={cluster.IpAddress} token={cluster.Token} />
+                    <StatusCell
+                      ip={cluster.IpAddress}
+                      token={cluster.Token}
+                      setToasts={setToasts}
+                      Toasts={Toasts}
+                    />
                   )}
                   {/* <Table.Cell>
               <span className="px-4 py-1 text-white bg-yellow-500 font-extrabold rounded-full">

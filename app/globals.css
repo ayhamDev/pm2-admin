@@ -14,3 +14,10 @@ body {
   margin: 0;
   transition: background-color 0.35s;
 }
+
+:root {
+  --Prime: #e3e3e3;
+}
+html.dark {
+  --Prime: #343434;
+}

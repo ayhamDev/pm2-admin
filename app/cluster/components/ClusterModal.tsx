@@ -52,6 +52,7 @@ export default function ClusterModal() {
         });
     } catch (err) {
       setLoading(false);
+      // @ts-ignore
       setError(JSON.parse(err));
     }
   };
@@ -74,13 +75,18 @@ export default function ClusterModal() {
                 <Text as="div" size="2" mb="1" weight="medium">
                   Server Name
                 </Text>
-                <TextField.Input ref={NameRef} placeholder="My Server..." />
+                <TextField.Input
+                  size={"3"}
+                  ref={NameRef}
+                  placeholder="My Server..."
+                />
               </label>
               <label>
                 <Text as="div" size="2" mb="1" weight="medium">
                   URL
                 </Text>
                 <TextField.Input
+                  size={"3"}
                   ref={IpRef}
                   placeholder="http://127.0.0.1:3020"
                 />
@@ -90,6 +96,7 @@ export default function ClusterModal() {
                   Token
                 </Text>
                 <TextField.Input
+                  size={"3"}
                   ref={TokenRef}
                   placeholder="Valid JWT Token From The Server"
                 />

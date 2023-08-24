@@ -3,8 +3,11 @@ import { DropdownMenu, Flex, IconButton, Text } from "@radix-ui/themes";
 import React from "react";
 import ThemeToggleButton from "./ThemeToggleButton";
 import { useTheme } from "next-themes";
+import { useRouter } from "next/navigation";
 
 export default function Avatar() {
+  const router = useRouter();
+
   const { theme, setTheme } = useTheme();
   return (
     <DropdownMenu.Root>
@@ -24,7 +27,7 @@ export default function Avatar() {
         </IconButton>
       </DropdownMenu.Trigger>
       <DropdownMenu.Content color="indigo" align="center">
-        <DropdownMenu.Item>
+        <DropdownMenu.Item onClick={() => router.push("/process")}>
           <Flex justify={"start"} align={"center"} gap={"2"}>
             <svg
               xmlns="http://www.w3.org/2000/svg"

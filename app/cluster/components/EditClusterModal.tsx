@@ -18,7 +18,7 @@ import { z } from "zod";
 interface IEditClusterModal {
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  id: string | null;
+  id: string | undefined;
 }
 
 export default function EditClusterModal({

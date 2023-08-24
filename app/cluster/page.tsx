@@ -8,7 +8,6 @@ export default function page() {
     <>
       <Navbar />
       <Container className="pt-28 px-6">
-        <Link href={"/signin"}>Login</Link>
         <ClusterTable />
       </Container>
     </>

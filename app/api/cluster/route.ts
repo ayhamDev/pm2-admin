@@ -36,6 +36,3 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(err, { status: 500 });
   }
 }
-interface IPutData extends z.infer<typeof clusterSchema> {
-  _id: string;
-}

@@ -1,4 +1,3 @@
-import clusterSchema from "@/schema/cluster.schema";
 import useCache from "@/store/useCache";
 import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
 import React from "react";

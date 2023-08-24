@@ -17,7 +17,7 @@ import { z } from "zod";
 interface IDeleteClusterModal {
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  id: string | null;
+  id: string | undefined;
 }
 
 export default function DeleteClusterModal({
